@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* NobodyWho brand (from nobodywho.ai), used on the closing slide */
+  --font-nw: "Inter Tight", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-nw-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --color-nw-ground: #4e1411;
+  --color-nw-deep: #2a0709;
+  --color-nw-section: #3d0f11;
+  --color-nw-glow: #72281a;
+  --color-nw-ink: #f4ede6;
+  --color-nw-accent: #f2a02e;
+
+  --animate-float: float 14s ease-in-out infinite;
+  --animate-float-slow: float 22s ease-in-out infinite reverse;
+  --animate-marquee: marquee 30s linear infinite;
+  --animate-bounce-slow: bounce 2.4s infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(6%, -8%) scale(1.08); }
+    66% { transform: translate(-5%, 6%) scale(0.95); }
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+}
+
+/* NobodyWho's maroon "ground" gradient. */
+@utility nw-ground {
+  background:
+    radial-gradient(90% 75% at 38% 80%, var(--color-nw-glow), transparent 72%),
+    radial-gradient(60% 55% at 88% 68%, rgb(110 40 22 / 0.55), transparent 70%),
+    linear-gradient(180deg, var(--color-nw-deep) 0%, #3e0f0e 38%, var(--color-nw-ground) 65%, #56180f 100%);
+}
+
+html {
+  background: var(--color-zinc-950);
+}
+
+/* Elements marked .reveal slide in once their slide is on screen. */
+.reveal {
+  opacity: 0;
+  transform: translateY(2rem);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 110ms);
+}
+
+[data-visible] .reveal {
+  opacity: 1;
+  transform: none;
+}
+
+/* The big stat pops a little. */
+.reveal-pop {
+  transform: scale(0.6) rotate(-6deg);
+}
+
+/* No JS: show everything. */
+html:not(.js) .reveal {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  * {
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
