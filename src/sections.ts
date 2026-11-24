@@ -8,8 +8,8 @@ import type { ThemeName } from './themes';
 export const sections = [
   {
     id: 'built-in',
-    title: 'Built in',
-    subtitle: 'The models that ship with your phone’s operating system, ready for any app to call.',
+    title: 'Built-in',
+    subtitle: 'The models that ship with your phone\'s operating system, ready for any app to call.',
     theme: 'violet',
     /** Show the whole chapter on its opener slide instead of one slide per item. */
     single: true,
@@ -17,7 +17,7 @@ export const sections = [
   {
     id: 'pocket',
     title: 'Pocket-sized',
-    subtitle: 'The race for smaller and smarter',
+    subtitle: 'The race for smaller and smarter models.',
     theme: 'lime',
   },
   {
@@ -35,7 +35,7 @@ export const sections = [
   {
     id: 'llama-cpp',
     title: 'The engine room',
-    subtitle: 'The runtimes under local AI apps grew up: llama.cpp, Google’s LiteRT-LM and PyTorch’s ExecuTorch.',
+    subtitle: 'The runtimes under local AI apps grew up: llama.cpp, Google\'s LiteRT-LM and PyTorch\'s ExecuTorch.',
     theme: 'blue',
   },
 ] as const satisfies readonly { id: string; title: string; subtitle: string; theme: ThemeName; single?: boolean }[];

@@ -9,7 +9,7 @@ stat:
   value: 30B
   label: parameters in Muse Glimmer, which runs locally at 33 tok/s on an M5 Pro Mac with speculative decoding
 summary: >-
-  Meta’s on-device runtime moved into PyTorch core under vendor-neutral PyTorch
+  Meta's on-device runtime moved into PyTorch core under vendor-neutral PyTorch
   Foundation governance, then grew from tiny microcontrollers all the way up to
   30B agent models.
 highlights:
