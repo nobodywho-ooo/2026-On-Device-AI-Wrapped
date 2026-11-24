@@ -1,0 +1,106 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Slide from './Slide.astro';
+import { themes } from '../themes';
+import { formatDate, formatDateRange, categoryLabels } from '../lib/format';
+
+/**
+ * A news item told as a row of releases (frontmatter `timeline:`) instead of one big number.
+ * Horizontal on wide screens, a vertical line on phones.
+ */
+interface Props {
+  item: CollectionEntry<'news'>;
+  index: number;
+  total: number;
+}
+
+const { item, index, total } = Astro.props;
+const { data } = item;
+const theme = themes[data.theme];
+const entries = [...(data.timeline ?? [])].sort((a, b) => a.date.getTime() - b.date.getTime());
+const number = String(index + 1).padStart(2, '0');
+---
+
+<Slide id={item.id} class:list={[theme.bg, theme.text]} blob={theme.blob} label={data.title}>
+  <div class="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-end lg:gap-16">
+    <div>
+      <p class="reveal flex flex-wrap items-center gap-2 text-sm font-semibold tracking-wide uppercase" style="--i:0">
+        <span class:list={['rounded-full px-3 py-1', theme.accent]}>#{number} of {total}</span>
+        <span class="opacity-80">{categoryLabels[data.category]} · {data.org}</span>
+      </p>
+      <h2
+        class="reveal reveal-pop font-display mt-5 text-[clamp(3rem,9vw,7rem)] leading-[0.85] font-extrabold tracking-tighter"
+        style="--i:1"
+      >
+        <span aria-hidden="true">{data.emoji} </span>{data.title}
+      </h2>
+    </div>
+    <div>
+      <p class="reveal text-lg leading-relaxed opacity-90 sm:text-xl" style="--i:2">{data.summary}</p>
+      {
+        data.links.length > 0 && (
+          <div class="reveal mt-5 flex flex-wrap gap-2" style="--i:3">
+            {data.links.map((link) => (
+              <a
+                href={link.url}
+                target="_blank"
+                rel="noopener"
+                class="rounded-full px-4 py-2 text-sm font-semibold ring-2 ring-current ring-inset transition hover:scale-105 hover:bg-current/10"
+              >
+                {link.label} ↗
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </div>
+
+  <ol
+    class="relative mt-10 grid gap-4 sm:mt-14 lg:gap-6"
+    style={`grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); --lg-cols: ${entries.length}`}
+    aria-label={`Timeline, ${formatDateRange(entries.map((e) => e.date))}`}
+  >
+    <!-- The line the dots sit on -->
+    <span
+      aria-hidden="true"
+      class="absolute top-2 bottom-2 left-[0.6875rem] w-0.5 bg-current opacity-30 lg:top-[0.6875rem] lg:right-0 lg:bottom-auto lg:left-0 lg:h-0.5 lg:w-auto"
+    ></span>
+    {
+      entries.map((e, i) => (
+        <li class="reveal relative pl-10 lg:pt-10 lg:pl-0" style={`--i:${i + 4}`}>
+          <span
+            aria-hidden="true"
+            class:list={['absolute top-1 left-0 size-6 rounded-full ring-4 ring-current/30 lg:top-0', theme.accent]}
+          />
+          <a
+            href={e.url}
+            target="_blank"
+            rel="noopener"
+            class:list={[
+              'group flex h-full flex-col rounded-3xl p-5 transition hover:-rotate-1 hover:scale-[1.02] sm:p-6',
+              'bg-zinc-950 text-white',
+            ]}
+          >
+            <span class="text-sm font-semibold tracking-wide uppercase opacity-75">
+              {formatDate(e.date)}
+              {e.org && ` · ${e.org}`}
+            </span>
+            <span class="font-display mt-2 text-3xl leading-none font-extrabold tracking-tight sm:text-4xl">{e.name}</span>
+            {e.size && <span class="mt-2 font-semibold">{e.size}</span>}
+            <span class="mt-3 leading-snug opacity-85">{e.detail}</span>
+            <span class="mt-auto pt-4 text-sm font-semibold group-hover:underline">Hugging Face ↗</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</Slide>
+
+<style>
+  @media (min-width: 64rem) {
+    ol {
+      --cols: var(--lg-cols);
+    }
+  }
+</style>

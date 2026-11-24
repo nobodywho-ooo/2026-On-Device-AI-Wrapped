@@ -3,7 +3,8 @@ import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
 import Slide from './Slide.astro';
 import { themes } from '../themes';
-import { formatDate, categoryLabels } from '../lib/format';
+import { site } from '../site.config';
+import { formatDate, categoryLabels, statFontSize } from '../lib/format';
 
 interface Props {
   item: CollectionEntry<'news'>;
@@ -22,7 +23,7 @@ const number = String(index + 1).padStart(2, '0');
 <Slide id={item.id} class:list={[theme.bg, theme.text]} blob={theme.blob} label={data.title}>
   <div class="grid items-center gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
     <!-- Left: the big number -->
-    <div>
+    <div class="@container min-w-0">
       <p class="reveal flex flex-wrap items-center gap-2 text-sm font-semibold tracking-wide uppercase" style="--i:0">
         <span class:list={['rounded-full px-3 py-1', theme.accent]}>#{number} of {total}</span>
         <span class="opacity-80">{formatDate(data.date)}</span>
@@ -30,13 +31,32 @@ const number = String(index + 1).padStart(2, '0');
 
       <div class="reveal mt-6 text-7xl leading-none sm:text-8xl" style="--i:1" aria-hidden="true">{data.emoji}</div>
 
+      {data.stat && (<>
       <p
-        class="reveal reveal-pop font-display mt-4 text-[clamp(4rem,14vw,10rem)] leading-[0.85] font-extrabold tracking-normal break-words [font-kerning:none]"
-        style="--i:2"
+        class="reveal reveal-pop font-display mt-4 leading-[0.85] font-extrabold tracking-normal whitespace-nowrap [font-kerning:none]"
+        style={`--i:2; font-size: ${statFontSize(data.stat.value, 'clamp(4rem,14vw,10rem)')}`}
       >
         {data.stat.value}
       </p>
       <p class="reveal mt-3 max-w-md text-lg font-medium opacity-85 sm:text-xl" style="--i:3">{data.stat.label}</p>
+      </>)}
+
+      {
+        data.tryOnPhone && (
+          <button
+            type="button"
+            data-try-on-phone
+            class:list={[
+              'reveal mt-6 inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold transition hover:scale-105',
+              theme.accent,
+            ]}
+            style="--i:4"
+          >
+            <span aria-hidden="true">📱</span>
+            {site.tryOnPhone.button}
+          </button>
+        )
+      }
     </div>
 
     <!-- Right: the story -->

@@ -3,12 +3,23 @@ import { getCollection } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import Slide from '../components/Slide.astro';
 import NewsSlide from '../components/NewsSlide.astro';
+import TimelineSlide from '../components/TimelineSlide.astro';
+import SectionSlide from '../components/SectionSlide.astro';
+import TryOnPhone from '../components/TryOnPhone.astro';
 import { site } from '../site.config';
+import { sections } from '../sections';
 import { formatDate } from '../lib/format';
 
-const news = (await getCollection('news', ({ data }) => !data.draft)).sort(
+const allNews = (await getCollection('news', ({ data }) => !data.draft)).sort(
   (a, b) => a.data.date.getTime() - b.data.date.getTime(),
 );
+
+// Group the news into chapters (in the order of src/sections.ts), dropping empty ones.
+const chapters = sections
+  .map((section) => ({ section, items: allNews.filter((n) => n.data.section === section.id) }))
+  .filter((c) => c.items.length > 0);
+// News in the order it is shown, so slide numbers follow the page.
+const news = chapters.flatMap((c) => c.items);
 
 // Numbers for the "year in numbers" slide, computed from the news files.
 const modelCount = news.filter((n) => n.data.category === 'model').length;
@@ -25,12 +36,21 @@ const more = (await getCollection('more', ({ data }) => !data.draft)).sort(
 );
 const { credits } = site;
 
+// One progress-bar segment per slide; chapter openers get a little extra space before them.
 const slideIds = [
-  'intro',
-  'numbers',
-  ...news.map((n) => n.id),
-  ...(more.length > 0 ? ['more'] : []),
-  'credits',
+  { id: 'intro' },
+  { id: 'numbers' },
+  ...chapters.flatMap((c) => [
+    { id: c.section.id, chapter: true },
+    ...('single' in c.section ? [] : c.items.map((n) => ({ id: n.id }))),
+  ]),
+  ...(more.length > 0 ? [{ id: 'more', chapter: true }] : []),
+  { id: 'credits' },
+];
+// Table of contents on the "year in numbers" slide.
+const chapterLinks = [
+  ...chapters.map(({ section }, c) => ({ id: section.id, number: String(c + 1).padStart(2, '0'), title: section.title })),
+  ...(more.length > 0 ? [{ id: 'more', number: '+', title: site.more.title }] : []),
 ];
 const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  ');
 ---
@@ -39,12 +59,12 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
   <!-- Story-style progress bar -->
   <nav aria-label="Slides" class="fixed inset-x-0 top-0 z-50 flex gap-1 p-3 mix-blend-difference sm:gap-1.5 sm:px-6">
     {
-      slideIds.map((id, i) => (
+      slideIds.map(({ id, chapter }, i) => (
         <a
           href={`#${id}`}
           data-progress={id}
           aria-label={`Go to slide ${i + 1}`}
-          class="group h-6 flex-1 py-2.5"
+          class:list={['group h-6 flex-1 py-2.5', chapter && 'ml-1.5 sm:ml-3']}
         >
           <span class="block h-1 overflow-hidden rounded-full bg-white/35">
             <span class="block h-full w-0 rounded-full bg-white transition-[width] duration-500 group-data-[state=done]:w-full group-data-[state=current]:w-full" />
@@ -67,17 +87,51 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
         <span class="animate-bounce-slow grid size-12 place-items-center rounded-full bg-lime-300 text-2xl text-zinc-950">↓</span>
         Scroll or press → to start
       </a>
+      <div class="reveal mt-10 -mx-4 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)] sm:-mx-10 lg:-mx-20" style="--i:5" aria-hidden="true">
+        <p class="animate-marquee font-display w-max text-2xl font-bold text-white/70 whitespace-nowrap">
+          {marquee} &nbsp;·&nbsp; {marquee} &nbsp;·&nbsp;
+        </p>
+      </div>
     </Slide>
 
     <!-- 2. Year in numbers -->
     <Slide id="numbers" class="bg-lime-300 text-zinc-950" blob="bg-emerald-500" label="Year in numbers">
       <h2 class="reveal font-display max-w-3xl text-4xl leading-none font-extrabold tracking-tight sm:text-6xl" style="--i:0">
-        This year, the AI in your pocket got a lot smarter.
+        This year, the AI on your own devices got a lot smarter.
       </h2>
-      <dl class="mt-10 grid gap-3 sm:grid-cols-3 sm:gap-4">
+      <!-- Jump to a chapter -->
+      <nav aria-label="Chapters" class="mt-8 sm:mt-10">
+        <ol
+          class="grid gap-x-10 sm:grid-flow-col sm:grid-cols-2 sm:[grid-template-rows:repeat(var(--rows),auto)]"
+          style={`--rows:${Math.ceil(chapterLinks.length / 2)}`}
+        >
+          {
+            chapterLinks.map((link, i) => (
+              <li
+                class:list={[
+                  'reveal border-t border-zinc-950/20',
+                  // No line above the first row of each column (only the first on phones, where it is one column).
+                  i === 0 && 'border-t-0',
+                  i === Math.ceil(chapterLinks.length / 2) && 'sm:border-t-0',
+                ]}
+                style={`--i:${i + 1}`}
+              >
+                <a href={`#${link.id}`} class="group flex items-baseline gap-4 py-2.5 sm:py-3">
+                  <span class="font-display w-8 shrink-0 text-lg font-extrabold opacity-50">{link.number}</span>
+                  <span class="font-display text-2xl leading-tight font-extrabold tracking-tight group-hover:underline sm:text-3xl">
+                    {link.title}
+                  </span>
+                  <span class="ml-auto text-xl transition group-hover:translate-x-1" aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+      <dl class="mt-8 grid sm:mt-10 gap-3 sm:grid-cols-3 sm:gap-4">
         {
           stats.map((s, i) => (
-            <div class="reveal flex flex-col-reverse rounded-3xl bg-zinc-950 p-4 text-lime-300 sm:p-6" style={`--i:${i + 1}`}>
+            <div class="reveal flex flex-col-reverse rounded-3xl bg-zinc-950 p-4 text-lime-300 sm:p-6" style={`--i:${i + 7}`}>
               <dt class="mt-3 font-medium text-white/85 sm:text-lg">{s.label}</dt>
               <dd
                 class:list={[
@@ -91,15 +145,23 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
           ))
         }
       </dl>
-      <div class="reveal mt-10 -mx-4 overflow-hidden sm:-mx-10 lg:-mx-20" style="--i:5" aria-hidden="true">
-        <p class="animate-marquee font-display w-max text-2xl font-bold whitespace-nowrap">
-          {marquee} &nbsp;·&nbsp; {marquee} &nbsp;·&nbsp;
-        </p>
-      </div>
     </Slide>
 
-    <!-- 3. One slide per news item -->
-    {news.map((item, i) => <NewsSlide item={item} index={i} total={news.length} />)}
+    <!-- 3. Chapters: an opener slide, then one slide per news item (or everything on the opener for `single` chapters) -->
+    {
+      chapters.map(({ section, items }, c) => (
+        <>
+          <SectionSlide section={section} number={c + 1} items={items} />
+          {!('single' in section) && items.map((item) =>
+            item.data.timeline ? (
+              <TimelineSlide item={item} index={news.indexOf(item)} total={news.length} />
+            ) : (
+              <NewsSlide item={item} index={news.indexOf(item)} total={news.length} />
+            ),
+          )}
+        </>
+      ))
+    }
 
     <!-- 4. Bonus tracks: short items from src/content/more/ -->
     {
@@ -146,7 +208,7 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
           <p class="reveal font-nw-mono text-sm font-medium tracking-[0.2em] text-nw-accent uppercase" style="--i:0">
             {credits.kicker}
           </p>
-          <h2 class="reveal mt-3 text-[clamp(3.5rem,8vw,7rem)] leading-[0.9] font-bold tracking-tight" style="--i:1">
+          <h2 class="reveal mt-3 text-[clamp(3rem,6.5vw,5.5rem)] leading-[0.9] font-bold tracking-tight" style="--i:1">
             {credits.name}
           </h2>
           <p class="reveal mt-4 text-2xl font-semibold text-nw-accent sm:text-3xl" style="--i:2">{credits.slogan}</p>
@@ -175,21 +237,23 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
           </div>
         </div>
 
-        <a
-          href={credits.highlight.link.url}
-          target="_blank"
-          rel="noopener"
-          class="reveal group block rounded-[2rem] border border-nw-ink/20 bg-nw-deep/70 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-nw-accent/60 sm:p-8"
-          style="--i:5"
-        >
-          <span class="text-6xl leading-none" aria-hidden="true">{credits.highlight.emoji}</span>
-          <span class="mt-4 block text-3xl leading-tight font-bold sm:text-4xl">{credits.highlight.title}</span>
-          <span class="mt-3 block text-lg leading-snug text-nw-ink/75">{credits.highlight.body}</span>
-          <span class="mt-6 inline-flex items-center gap-1.5 rounded-full bg-nw-accent px-4 py-2 font-semibold text-nw-deep transition group-hover:scale-105">
-            {credits.highlight.link.label}
-            <svg viewBox="0 0 20 20" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 14.5 14.5 5.5M7 5.5h7.5V13" /></svg>
-          </span>
-        </a>
+        <ul class="reveal flex flex-wrap justify-center gap-3 sm:gap-4" style="--i:5" aria-label="NobodyWho docs by platform">
+          {credits.platforms.map((p) => (
+            <li class="w-[calc((100%-2.25rem)/4)] sm:w-[calc((100%-3rem)/4)]">
+              <a
+                href={p.url}
+                target="_blank"
+                rel="noopener"
+                class="group flex aspect-square h-full flex-col items-center justify-center gap-2 rounded-3xl border border-nw-ink/20 bg-nw-deep/70 p-3 backdrop-blur transition hover:-translate-y-1 hover:border-nw-accent/60 hover:text-nw-accent"
+              >
+                <svg viewBox="0 0 24 24" class="size-9 shrink-0 transition group-hover:scale-110 sm:size-11" fill="currentColor" aria-hidden="true">
+                  <path d={p.icon} />
+                </svg>
+                <span class="text-center text-xs leading-tight font-semibold sm:text-sm">{p.name}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div class="reveal mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-nw-ink/30 pt-6" style="--i:6">
@@ -201,6 +265,8 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
       </div>
     </Slide>
   </main>
+
+  {news.some((n) => n.data.tryOnPhone) && <TryOnPhone />}
 
   <script>
     const deck = document.getElementById('deck')!;
@@ -229,7 +295,11 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
         }
         if (slide.offsetTop <= top + height / 2) middle = i;
       });
-      if (middle !== current) setCurrent(middle);
+      if (middle !== current) {
+        setCurrent(middle);
+        // Keep the URL on the slide in view, like the arrow keys do, so it can be shared or reloaded.
+        history.replaceState(null, '', `#${slides[middle].id}`);
+      }
     };
     deck.addEventListener('scroll', update, { passive: true });
     setCurrent(0);
@@ -245,6 +315,7 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
 
     document.addEventListener('keydown', (e) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (document.querySelector('dialog[open]')) return; // let an open popup keep the keyboard
       if (['ArrowRight', 'ArrowDown', 'PageDown', 'j'].includes(e.key)) {
         e.preventDefault();
         go(current + 1);

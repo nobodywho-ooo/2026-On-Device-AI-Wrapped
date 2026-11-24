@@ -45,6 +45,12 @@ export const themes = {
     accent: 'bg-zinc-950 text-yellow-300',
     blob: 'bg-orange-500',
   },
+  white: {
+    bg: 'bg-white',
+    text: 'text-zinc-950',
+    accent: 'bg-zinc-950 text-white',
+    blob: 'bg-zinc-300',
+  },
   black: {
     bg: 'bg-zinc-950',
     text: 'text-white',

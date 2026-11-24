@@ -8,18 +8,21 @@ A Spotify-Wrapped-style recap of the year in on-device and local AI, built with 
 npm install
 npm run dev      # http://localhost:4321
 npm run build    # static site in dist/
+npx astro dev stop # stop background server
+npm run dev -- --force # delete cache and run
 ```
 
 Navigate with scroll, the arrow keys, or by clicking the progress bar at the top.
 
 ## Editing the news
 
-Each story is **one Markdown file** in [`src/content/news/`](src/content/news/). Slides are sorted by `date`, so the filename is only for your convenience.
+Each story is **one Markdown file** in [`src/content/news/`](src/content/news/). Stories are grouped into chapters (see [`src/sections.ts`](src/sections.ts)) and sorted by `date` inside each chapter, so the filename is only for your convenience. Each chapter opens with a tracklist slide; empty chapters are hidden.
 
 ```md
 ---
 title: llama.cpp hits 1.0.0          # headline
 date: 2026-11-13                     # YYYY-MM-DD, used for ordering
+section: llama-cpp                   # built-in | pocket | laptop | llama-cpp
 category: tooling                    # model | tooling | platform | industry
 org: ggml-org                        # who shipped it (use "A × B" for two)
 emoji: 🦙                            # big icon on the slide
@@ -68,6 +71,7 @@ The slide is hidden automatically when the folder is empty.
 | File | What it controls |
 | --- | --- |
 | [`src/site.config.ts`](src/site.config.ts) | Year, title, tagline, bonus-tracks heading, closing "Brought to you by" slide |
+| [`src/sections.ts`](src/sections.ts) | Chapters: order, titles, subtitles and colours |
 | [`src/themes.ts`](src/themes.ts) | Slide colour palettes (add your own) |
 | [`src/pages/index.astro`](src/pages/index.astro) | Intro, stats, bonus tracks and closing slides |
 | [`src/components/NewsSlide.astro`](src/components/NewsSlide.astro) | Layout of a news slide |
