@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Slide from './Slide.astro';
-import Logo from './Logo.astro';
+import ItemIcon from './ItemIcon.astro';
 import { themes } from '../themes';
 import { formatDate, formatDateRange, statFontSize } from '../lib/format';
 import type { sections } from '../sections';
@@ -32,35 +32,29 @@ const single = 'single' in section && section.single;
               Chapter {chapter}
             </p>
             <h2
-              class="reveal reveal-pop font-display mt-3 text-[clamp(3rem,8vw,6rem)] leading-[0.85] font-extrabold tracking-tighter"
+              class="reveal reveal-pop font-display mt-2 text-[clamp(2.5rem,8vw,6rem)] sm:mt-3 leading-[0.85] font-extrabold tracking-tighter"
               style="--i:1"
             >
               {section.title}
             </h2>
           </div>
-          <p class="reveal max-w-md text-lg leading-snug opacity-90 sm:text-xl" style="--i:2">
+          <p class="reveal max-w-md text-base leading-snug opacity-90 sm:text-xl" style="--i:2">
             {section.subtitle}
           </p>
         </div>
 
-        <div class="mt-8 grid gap-4 md:grid-cols-2 sm:gap-6">
+        <div class="mt-5 grid gap-3 sm:mt-8 sm:gap-6 md:grid-cols-2">
           {items.map((item, i) => {
             const t = themes[item.data.theme];
             const link = item.data.links[0];
             return (
               <article
                 id={item.id}
-                class:list={['reveal flex flex-col rounded-[2rem] p-6 sm:p-8', t.bg, t.text]}
+                class:list={['reveal flex flex-col rounded-3xl p-5 sm:rounded-[2rem] sm:p-8', t.bg, t.text]}
                 style={`--i:${i + 3}`}
               >
-                <p class="flex items-center gap-3 text-sm font-semibold tracking-wide uppercase">
-                  {item.data.logo ? (
-                    <Logo name={item.data.logo} class="size-10" />
-                  ) : (
-                    <span class="text-4xl leading-none" aria-hidden="true">
-                      {item.data.emoji}
-                    </span>
-                  )}
+                <p class="flex items-center gap-3 text-xs font-semibold tracking-wide uppercase sm:text-sm">
+                  <ItemIcon logo={item.data.logo} emoji={item.data.emoji} logoClass="size-8 sm:size-10" emojiClass="text-3xl leading-none sm:text-4xl" />
                   <span class="opacity-80">
                     {formatDate(item.data.date)} · {item.data.org}
                   </span>
@@ -68,18 +62,18 @@ const single = 'single' in section && section.single;
                 {item.data.stat && (<>
                 <div class="@container">
                   <p
-                    class="font-display mt-4 leading-none font-extrabold whitespace-nowrap"
-                    style={`font-size: ${statFontSize(item.data.stat.value, 'clamp(3.75rem,6vw,4.5rem)')}`}
+                    class="font-display mt-3 leading-none font-extrabold whitespace-nowrap sm:mt-4"
+                    style={`font-size: ${statFontSize(item.data.stat.value, 'clamp(2.75rem,6vw,4.5rem)')}`}
                   >
                     {item.data.stat.value}
                   </p>
                 </div>
                 <p class="mt-1 text-sm font-medium opacity-80">{item.data.stat.label}</p>
                 </>)}
-                <h3 class="font-display mt-5 text-2xl leading-tight font-extrabold sm:text-3xl">{item.data.title}</h3>
-                <p class="mt-3 leading-relaxed opacity-90">{item.data.summary}</p>
+                <h3 class="font-display mt-3 text-xl leading-tight font-extrabold sm:mt-5 sm:text-3xl">{item.data.title}</h3>
+                <p class="mt-3 hidden leading-relaxed opacity-90 sm:block">{item.data.summary}</p>
                 {item.data.highlights.length > 0 && (
-                  <ul class="mt-4 space-y-1.5 text-sm">
+                  <ul class="mt-4 hidden space-y-1.5 text-sm sm:block">
                     {item.data.highlights.map((h) => (
                       <li class="flex gap-3 leading-snug">
                         <span class:list={['mt-1.5 size-2 shrink-0 rounded-full', t.accent]} />
@@ -94,7 +88,7 @@ const single = 'single' in section && section.single;
                     target="_blank"
                     rel="noopener"
                     class:list={[
-                      'mt-6 self-start rounded-full px-4 py-2 text-sm font-semibold transition hover:scale-105',
+                      'mt-4 self-start rounded-full px-3 py-1.5 text-xs font-semibold sm:mt-6 sm:px-4 sm:py-2 sm:text-sm transition hover:scale-105',
                       t.accent,
                     ]}
                   >
@@ -131,9 +125,12 @@ const single = 'single' in section && section.single;
                 class="group flex items-center gap-4 rounded-2xl px-3 py-2.5 transition hover:bg-current/10"
               >
                 <span class="font-display w-6 text-right text-lg font-bold opacity-60">{i + 1}</span>
-                <span class="text-3xl leading-none" aria-hidden="true">
-                  {item.data.emoji}
-                </span>
+                <ItemIcon
+                  logo={item.data.logo}
+                  emoji={item.data.emoji}
+                  logoClass="size-[1.875rem] shrink-0"
+                  emojiClass="text-3xl leading-none"
+                />
                 <span class="min-w-0">
                   <span class="block text-lg leading-tight font-bold group-hover:underline">{item.data.title}</span>
                   <span class="block text-sm opacity-75">

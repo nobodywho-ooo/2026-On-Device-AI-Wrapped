@@ -57,6 +57,37 @@ export const themes = {
     accent: 'bg-lime-300 text-zinc-950',
     blob: 'bg-violet-600',
   },
+  // Brand-matched palettes for slides that show a logo.
+  qwen: {
+    bg: 'bg-violet-200',
+    text: 'text-zinc-950',
+    accent: 'bg-zinc-950 text-violet-200',
+    blob: 'bg-indigo-400',
+  },
+  gemma: {
+    bg: 'bg-blue-950',
+    text: 'text-white',
+    accent: 'bg-blue-300 text-blue-950',
+    blob: 'bg-blue-500',
+  },
+  pytorch: {
+    bg: 'bg-red-100',
+    text: 'text-zinc-950',
+    accent: 'bg-zinc-950 text-red-100',
+    blob: 'bg-red-400',
+  },
+  bonsai: {
+    bg: 'bg-emerald-200',
+    text: 'text-zinc-950',
+    accent: 'bg-zinc-950 text-emerald-200',
+    blob: 'bg-green-500',
+  },
+  liquid: {
+    bg: 'bg-zinc-300',
+    text: 'text-zinc-950',
+    accent: 'bg-zinc-950 text-zinc-200',
+    blob: 'bg-zinc-500',
+  },
 } as const;
 
 export type ThemeName = keyof typeof themes;

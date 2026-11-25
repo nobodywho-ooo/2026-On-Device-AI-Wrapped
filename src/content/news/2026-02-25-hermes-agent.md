@@ -5,6 +5,7 @@ section: agents
 category: tooling
 org: Nous Research
 emoji: 🪽
+logo: hermes
 stat:
   value: 266K
   label: GitHub stars for a self-hosted agent that writes its own skills

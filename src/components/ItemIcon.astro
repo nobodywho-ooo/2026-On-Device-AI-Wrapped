@@ -1,0 +1,17 @@
+---
+import Logo from './Logo.astro';
+
+/** A news item's icon: its brand logo when `logo:` is set, otherwise its emoji. */
+interface Props {
+  logo?: 'apple' | 'google' | 'android' | 'bonsai' | 'gemma' | 'liquid' | 'qwen' | 'hermes' | 'pi' | 'pytorch';
+  emoji: string;
+  /** Size classes for the logo. */
+  logoClass: string;
+  /** Size classes for the emoji. */
+  emojiClass?: string;
+}
+
+const { logo, emoji, logoClass, emojiClass = '' } = Astro.props;
+---
+
+{logo ? <Logo name={logo} class={logoClass} /> : <span class={emojiClass} aria-hidden="true">{emoji}</span>}

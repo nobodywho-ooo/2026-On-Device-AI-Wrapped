@@ -2,7 +2,6 @@
 export const site = {
   year: 2026,
   title: 'On-Device AI Wrapped',
-  tagline: 'The year AI moved into your pocket.',
   description:
     'A Wrapped-style recap of the biggest on-device and local AI news of the year: new small models, phones, and the tools that run them.',
 
@@ -10,6 +9,8 @@ export const site = {
   more: {
     kicker: 'Bonus tracks',
     title: 'Bonus',
+    /** A closing line under the cards. */
+    outlook: 'Our bet for 2027: diffusion language models get fast and small enough to run on your device.',
   },
 
   /** "Try it on your phone" button and popup, shown on news items with `tryOnPhone: true`. */

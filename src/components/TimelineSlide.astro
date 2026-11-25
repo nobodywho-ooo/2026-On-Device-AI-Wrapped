@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Slide from './Slide.astro';
+import ItemIcon from './ItemIcon.astro';
 import { themes } from '../themes';
 import { formatDate, formatDateRange, categoryLabels } from '../lib/format';
 
@@ -22,30 +23,30 @@ const number = String(index + 1).padStart(2, '0');
 ---
 
 <Slide id={item.id} class:list={[theme.bg, theme.text]} blob={theme.blob} label={data.title}>
-  <div class="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-end lg:gap-16">
+  <div class="grid gap-4 sm:gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-end lg:gap-16">
     <div>
       <p class="reveal flex flex-wrap items-center gap-2 text-sm font-semibold tracking-wide uppercase" style="--i:0">
         <span class:list={['rounded-full px-3 py-1', theme.accent]}>#{number} of {total}</span>
         <span class="opacity-80">{categoryLabels[data.category]} · {data.org}</span>
       </p>
       <h2
-        class="reveal reveal-pop font-display mt-5 text-[clamp(3rem,9vw,7rem)] leading-[0.85] font-extrabold tracking-tighter"
+        class="reveal reveal-pop font-display mt-3 text-[clamp(2.25rem,9vw,7rem)] sm:mt-5 leading-[0.85] font-extrabold tracking-tighter"
         style="--i:1"
       >
-        <span aria-hidden="true">{data.emoji} </span>{data.title}
+        <span aria-hidden="true"><ItemIcon logo={data.logo} emoji={data.emoji} logoClass="inline-block size-[0.85em] align-[-0.05em]" />{' '}</span>{data.title}
       </h2>
     </div>
     <div>
-      <p class="reveal text-lg leading-relaxed opacity-90 sm:text-xl" style="--i:2">{data.summary}</p>
+      <p class="reveal text-base leading-snug opacity-90 sm:text-xl sm:leading-relaxed" style="--i:2">{data.summary}</p>
       {
         data.links.length > 0 && (
-          <div class="reveal mt-5 flex flex-wrap gap-2" style="--i:3">
+          <div class="reveal mt-4 flex flex-wrap gap-2 sm:mt-5" style="--i:3">
             {data.links.map((link) => (
               <a
                 href={link.url}
                 target="_blank"
                 rel="noopener"
-                class="rounded-full px-4 py-2 text-sm font-semibold ring-2 ring-current ring-inset transition hover:scale-105 hover:bg-current/10"
+                class="rounded-full px-3 py-1.5 text-xs font-semibold ring-2 sm:px-4 sm:py-2 sm:text-sm ring-current ring-inset transition hover:scale-105 hover:bg-current/10"
               >
                 {link.label} ↗
               </a>
@@ -57,7 +58,7 @@ const number = String(index + 1).padStart(2, '0');
   </div>
 
   <ol
-    class="relative mt-10 grid gap-4 sm:mt-14 lg:gap-6"
+    class="relative mt-6 grid gap-3 sm:mt-14 sm:gap-4 lg:gap-6"
     style={`grid-template-columns: repeat(var(--cols, 1), minmax(0, 1fr)); --lg-cols: ${entries.length}`}
     aria-label={`Timeline, ${formatDateRange(entries.map((e) => e.date))}`}
   >
@@ -78,18 +79,20 @@ const number = String(index + 1).padStart(2, '0');
             target="_blank"
             rel="noopener"
             class:list={[
-              'group flex h-full flex-col rounded-3xl p-5 transition hover:-rotate-1 hover:scale-[1.02] sm:p-6',
+              'group flex h-full flex-col rounded-2xl p-4 transition sm:rounded-3xl hover:-rotate-1 hover:scale-[1.02] sm:p-6',
               'bg-zinc-950 text-white',
             ]}
           >
-            <span class="text-sm font-semibold tracking-wide uppercase opacity-75">
+            <span class="text-xs font-semibold tracking-wide uppercase opacity-75 sm:text-sm">
               {formatDate(e.date)}
               {e.org && ` · ${e.org}`}
             </span>
-            <span class="font-display mt-2 text-3xl leading-none font-extrabold tracking-tight sm:text-4xl">{e.name}</span>
-            {e.size && <span class="mt-2 font-semibold">{e.size}</span>}
-            <span class="mt-3 leading-snug opacity-85">{e.detail}</span>
-            <span class="mt-auto pt-4 text-sm font-semibold group-hover:underline">Hugging Face ↗</span>
+            <span class="mt-1 flex flex-wrap items-baseline gap-x-2 sm:mt-2 sm:block">
+              <span class="font-display block text-2xl leading-none font-extrabold tracking-tight sm:text-3xl lg:text-4xl">{e.name}</span>
+              {e.size && <span class="block text-sm font-semibold sm:mt-2 sm:text-base">{e.size}</span>}
+            </span>
+            <span class="mt-2 text-sm leading-snug opacity-85 sm:mt-3 sm:text-base">{e.detail}</span>
+            <span class="mt-auto hidden pt-4 text-sm sm:block font-semibold group-hover:underline">Hugging Face ↗</span>
           </a>
         </li>
       ))

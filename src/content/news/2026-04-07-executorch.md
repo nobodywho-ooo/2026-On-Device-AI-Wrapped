@@ -5,6 +5,7 @@ section: llama-cpp
 category: tooling
 org: PyTorch × Meta
 emoji: 🔥
+logo: pytorch
 stat:
   value: 30B
   label: parameters in Muse Glimmer, which runs locally at 33 tok/s on an M5 Pro Mac with speculative decoding
@@ -23,5 +24,5 @@ links:
     url: https://pytorch.org/blog/fast-ondevice-agentic-ai-with-executorch/
   - label: ExecuTorch on GitHub
     url: https://github.com/pytorch/executorch
-theme: orange
+theme: pytorch
 ---

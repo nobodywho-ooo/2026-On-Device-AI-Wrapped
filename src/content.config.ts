@@ -4,6 +4,9 @@ import { z } from 'astro/zod';
 import { themeNames } from './themes';
 import { sectionIds } from './sections';
 
+/** Brand logos available in `src/components/Logo.astro`. */
+const logo = z.enum(['apple', 'google', 'bonsai', 'gemma', 'liquid', 'qwen', 'hermes', 'pi', 'pytorch']).optional();
+
 /**
  * Every news item is one Markdown file in `src/content/news/`.
  * The frontmatter below is validated at build time, so a typo in a field
@@ -24,8 +27,8 @@ const news = defineCollection({
     org: z.string(),
     /** One emoji used as the slide's big icon. */
     emoji: z.string(),
-    /** Optional brand logo shown instead of the emoji on single-slide chapters, see `src/components/Logo.astro`. */
-    logo: z.enum(['apple', 'google']).optional(),
+    /** Optional brand logo shown instead of the emoji, see `src/components/Logo.astro`. */
+    logo,
     /** The big Wrapped-style number on the slide. Required unless the slide has a `timeline`. */
     stat: z
       .object({
@@ -80,6 +83,8 @@ const more = defineCollection({
     date: z.coerce.date(),
     org: z.string(),
     emoji: z.string(),
+    /** Optional brand logo shown instead of the emoji. */
+    logo,
     /** One sentence. */
     summary: z.string(),
     link: z.object({ label: z.string(), url: z.string().url() }),

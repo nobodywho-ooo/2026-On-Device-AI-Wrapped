@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { render } from 'astro:content';
 import Slide from './Slide.astro';
+import ItemIcon from './ItemIcon.astro';
 import { themes } from '../themes';
 import { site } from '../site.config';
 import { formatDate, categoryLabels, statFontSize } from '../lib/format';
@@ -21,7 +22,7 @@ const number = String(index + 1).padStart(2, '0');
 ---
 
 <Slide id={item.id} class:list={[theme.bg, theme.text]} blob={theme.blob} label={data.title}>
-  <div class="grid items-center gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+  <div class="grid items-center gap-5 sm:gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
     <!-- Left: the big number -->
     <div class="@container min-w-0">
       <p class="reveal flex flex-wrap items-center gap-2 text-sm font-semibold tracking-wide uppercase" style="--i:0">
@@ -29,17 +30,25 @@ const number = String(index + 1).padStart(2, '0');
         <span class="opacity-80">{formatDate(data.date)}</span>
       </p>
 
-      <div class="reveal mt-6 text-7xl leading-none sm:text-8xl" style="--i:1" aria-hidden="true">{data.emoji}</div>
-
-      {data.stat && (<>
-      <p
-        class="reveal reveal-pop font-display mt-4 leading-[0.85] font-extrabold tracking-normal whitespace-nowrap [font-kerning:none]"
-        style={`--i:2; font-size: ${statFontSize(data.stat.value, 'clamp(4rem,14vw,10rem)')}`}
-      >
-        {data.stat.value}
-      </p>
-      <p class="reveal mt-3 max-w-md text-lg font-medium opacity-85 sm:text-xl" style="--i:3">{data.stat.label}</p>
-      </>)}
+      <!-- Icon and big number share a row on phones, stack on bigger screens -->
+      <div class="mt-4 flex items-center gap-3 sm:mt-0 sm:block">
+        <div class="reveal shrink-0 text-5xl leading-none sm:mt-6 sm:text-8xl" style="--i:1" aria-hidden="true">
+          <ItemIcon logo={data.logo} emoji={data.emoji} logoClass="size-[1em]" />
+        </div>
+        {data.stat && (
+          <div class="@container min-w-0 flex-1">
+            <p
+              class="reveal reveal-pop font-display leading-[0.85] font-extrabold tracking-normal whitespace-nowrap [font-kerning:none] sm:mt-4"
+              style={`--i:2; font-size: ${statFontSize(data.stat.value, 'clamp(3rem,14vw,10rem)')}`}
+            >
+              {data.stat.value}
+            </p>
+          </div>
+        )}
+      </div>
+      {data.stat && (
+        <p class="reveal mt-2 max-w-md text-base font-medium opacity-85 sm:mt-3 sm:text-xl" style="--i:3">{data.stat.label}</p>
+      )}
 
       {
         data.tryOnPhone && (
@@ -47,7 +56,7 @@ const number = String(index + 1).padStart(2, '0');
             type="button"
             data-try-on-phone
             class:list={[
-              'reveal mt-6 inline-flex items-center gap-2 rounded-full px-5 py-3 font-semibold transition hover:scale-105',
+              'reveal mt-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition hover:scale-105 sm:mt-6 sm:px-5 sm:py-3 sm:text-base',
               theme.accent,
             ]}
             style="--i:4"
@@ -64,14 +73,14 @@ const number = String(index + 1).padStart(2, '0');
       <p class="reveal text-sm font-semibold tracking-wide uppercase opacity-75" style="--i:3">
         {categoryLabels[data.category]} · {data.org}
       </p>
-      <h2 class="reveal font-display mt-2 text-4xl leading-none font-extrabold tracking-tight sm:text-6xl" style="--i:4">
+      <h2 class="reveal font-display mt-2 text-3xl leading-none font-extrabold tracking-tight sm:text-6xl" style="--i:4">
         {data.title}
       </h2>
-      <p class="reveal mt-5 text-lg leading-relaxed opacity-90" style="--i:5">{data.summary}</p>
+      <p class="reveal mt-3 text-base leading-snug opacity-90 sm:mt-5 sm:text-lg sm:leading-relaxed" style="--i:5">{data.summary}</p>
 
       {
         data.highlights.length > 0 && (
-          <ul class="reveal mt-6 space-y-2" style="--i:6">
+          <ul class="reveal mt-4 space-y-1.5 text-sm sm:mt-6 sm:space-y-2 sm:text-base" style="--i:6">
             {data.highlights.map((h) => (
               <li class="flex gap-3 leading-snug">
                 <span class:list={['mt-1.5 size-2 shrink-0 rounded-full', theme.accent]} />
@@ -84,7 +93,7 @@ const number = String(index + 1).padStart(2, '0');
 
       {
         hasBody && (
-          <div class="reveal mt-6 space-y-3 leading-relaxed opacity-90 [&_a]:font-semibold [&_a]:underline" style="--i:7">
+          <div class="reveal mt-4 space-y-3 text-sm leading-relaxed sm:mt-6 sm:text-base opacity-90 [&_a]:font-semibold [&_a]:underline" style="--i:7">
             <Content />
           </div>
         )
@@ -92,14 +101,14 @@ const number = String(index + 1).padStart(2, '0');
 
       {
         data.links.length > 0 && (
-          <div class="reveal mt-8 flex flex-wrap gap-2" style="--i:7">
+          <div class="reveal mt-5 flex flex-wrap gap-2 sm:mt-8" style="--i:7">
             {data.links.map((link, i) => (
               <a
                 href={link.url}
                 target="_blank"
                 rel="noopener"
                 class:list={[
-                  'rounded-full px-4 py-2 text-sm font-semibold transition hover:scale-105',
+                  'rounded-full px-3 py-1.5 text-xs font-semibold transition hover:scale-105 sm:px-4 sm:py-2 sm:text-sm',
                   i === 0 ? theme.accent : 'ring-2 ring-current ring-inset hover:bg-current/10',
                 ]}
               >

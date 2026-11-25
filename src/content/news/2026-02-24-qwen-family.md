@@ -5,6 +5,7 @@ section: laptop
 category: model
 org: Alibaba Qwen
 emoji: 🐉
+logo: qwen
 summary: >-
   Alibaba shipped 3 generations of Qwen this year, each one bringing coding
   and agent skills that had never run on consumer hardware before.
@@ -24,5 +25,5 @@ timeline:
     size: 27B
     detail: Built for long-horizon agentic tasks, and reads images and video.
     url: https://huggingface.co/collections/Qwen/qwen38
-theme: cyan
+theme: qwen
 ---

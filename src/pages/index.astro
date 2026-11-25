@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import ItemIcon from '../components/ItemIcon.astro';
 import Layout from '../layouts/Layout.astro';
 import Slide from '../components/Slide.astro';
 import NewsSlide from '../components/NewsSlide.astro';
@@ -20,16 +21,6 @@ const chapters = sections
   .filter((c) => c.items.length > 0);
 // News in the order it is shown, so slide numbers follow the page.
 const news = chapters.flatMap((c) => c.items);
-
-// Numbers for the "year in numbers" slide, computed from the news files.
-const modelCount = news.filter((n) => n.data.category === 'model').length;
-const orgCount = new Set(news.flatMap((n) => n.data.org.split(/\s*×\s*/))).size;
-
-const stats = [
-  { value: news.length, label: 'big moments' },
-  { value: modelCount, label: 'major model families' },
-  { value: orgCount, label: 'companies & projects' },
-];
 
 const more = (await getCollection('more', ({ data }) => !data.draft)).sort(
   (a, b) => a.data.date.getTime() - b.data.date.getTime(),
@@ -77,21 +68,18 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
   <main id="deck" class="relative h-dvh snap-y snap-proximity overflow-y-auto scroll-smooth lg:snap-mandatory">
     <!-- 1. Intro -->
     <Slide id="intro" class="bg-zinc-950 text-white" blob="bg-violet-600" label="Intro">
-      <p class="reveal text-sm font-semibold tracking-[0.3em] text-lime-300 uppercase" style="--i:0">{site.title}</p>
+      <p class="reveal font-display text-[clamp(2rem,6vw,4.5rem)] leading-none font-extrabold tracking-tight text-lime-300" style="--i:0">On-device</p>
       <h1 class="font-display mt-4 leading-[0.8] font-extrabold tracking-tighter">
-        <span class="reveal block text-[clamp(6rem,28vw,20rem)]" style="--i:1">{site.year}</span>
+        <span class="reveal block text-[clamp(5rem,22vw,15rem)]" style="--i:1">{site.year}</span>
         <span class="reveal mt-2 block text-[clamp(2.5rem,8vw,6rem)] text-lime-300" style="--i:2">Wrapped</span>
       </h1>
-      <p class="reveal mt-8 max-w-xl text-xl text-white/80 sm:text-2xl" style="--i:3">{site.tagline}</p>
-      <a href="#numbers" class="reveal mt-12 inline-flex items-center gap-3 font-semibold" style="--i:4">
+      <p class="reveal mt-8 text-xl text-balance text-white/80 sm:text-2xl" style="--i:3">
+        In case you missed it, here are the year's biggest on-device AI stories.
+      </p>
+      <a href="#numbers" class="reveal mt-10 inline-flex items-center gap-3 font-semibold" style="--i:4">
         <span class="animate-bounce-slow grid size-12 place-items-center rounded-full bg-lime-300 text-2xl text-zinc-950">↓</span>
-        Scroll or press → to start
+        Scroll or use arrow keys
       </a>
-      <div class="reveal mt-10 -mx-4 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)] sm:-mx-10 lg:-mx-20" style="--i:5" aria-hidden="true">
-        <p class="animate-marquee font-display w-max text-2xl font-bold text-white/70 whitespace-nowrap">
-          {marquee} &nbsp;·&nbsp; {marquee} &nbsp;·&nbsp;
-        </p>
-      </div>
     </Slide>
 
     <!-- 2. Year in numbers -->
@@ -128,23 +116,11 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
           }
         </ol>
       </nav>
-      <dl class="mt-8 grid sm:mt-10 gap-3 sm:grid-cols-3 sm:gap-4">
-        {
-          stats.map((s, i) => (
-            <div class="reveal flex flex-col-reverse rounded-3xl bg-zinc-950 p-4 text-lime-300 sm:p-6" style={`--i:${i + 7}`}>
-              <dt class="mt-3 font-medium text-white/85 sm:text-lg">{s.label}</dt>
-              <dd
-                class:list={[
-                  'font-display leading-none font-extrabold tracking-tighter break-words',
-                  typeof s.value === 'number' ? 'text-6xl' : 'text-4xl xl:text-5xl',
-                ]}
-              >
-                {s.value}
-              </dd>
-            </div>
-          ))
-        }
-      </dl>
+      <div class="reveal mt-8 -mx-4 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)] sm:mt-10 sm:-mx-10 lg:-mx-20" style={`--i:${chapterLinks.length + 1}`} aria-hidden="true">
+        <p class="animate-marquee font-display w-max text-2xl font-bold text-zinc-950/70 whitespace-nowrap">
+          {marquee} &nbsp;·&nbsp; {marquee} &nbsp;·&nbsp;
+        </p>
+      </div>
     </Slide>
 
     <!-- 3. Chapters: an opener slide, then one slide per news item (or everything on the opener for `single` chapters) -->
@@ -170,26 +146,26 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
           <p class="reveal text-sm font-semibold tracking-[0.3em] uppercase" style="--i:0">
             {site.more.kicker}
           </p>
-          <h2 class="reveal font-display mt-3 text-5xl leading-none font-extrabold tracking-tight sm:text-7xl" style="--i:1">
+          <h2 class="reveal font-display mt-2 text-4xl leading-none font-extrabold tracking-tight sm:mt-3 sm:text-7xl" style="--i:1">
             {site.more.title}
           </h2>
-          <ul class="mt-10 grid gap-4 md:grid-cols-2">
+          <ul class="mt-5 grid gap-3 sm:mt-10 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
             {more.map((m, i) => (
               <li class="reveal" style={`--i:${i + 2}`}>
                 <a
                   href={m.data.link.url}
                   target="_blank"
                   rel="noopener"
-                  class="group flex h-full gap-4 rounded-3xl bg-zinc-950 p-5 text-white transition hover:-rotate-1 hover:scale-[1.02] sm:p-6"
+                  class="group flex h-full gap-3 rounded-2xl bg-zinc-950 p-4 sm:gap-4 sm:rounded-3xl lg:flex-col text-white transition hover:-rotate-1 hover:scale-[1.02] sm:p-6"
                 >
-                  <span class="text-4xl leading-none" aria-hidden="true">{m.data.emoji}</span>
+                  <ItemIcon logo={m.data.logo} emoji={m.data.emoji} logoClass="size-8 shrink-0 sm:size-10" emojiClass="text-3xl leading-none sm:text-4xl" />
                   <span class="min-w-0">
-                    <span class="block text-sm font-semibold text-fuchsia-300">
+                    <span class="block text-xs font-semibold text-fuchsia-300 sm:text-sm">
                       {formatDate(m.data.date)} · {m.data.org}
                     </span>
-                    <span class="font-display mt-1 block text-2xl leading-tight font-extrabold">{m.data.title}</span>
-                    <span class="mt-2 block leading-snug text-white/80">{m.data.summary}</span>
-                    <span class="mt-3 block text-sm font-semibold text-fuchsia-300 group-hover:underline">
+                    <span class="font-display mt-1 block text-xl leading-tight font-extrabold sm:text-2xl">{m.data.title}</span>
+                    <span class="mt-1 block text-sm leading-snug text-white/80 sm:mt-2 sm:text-base">{m.data.summary}</span>
+                    <span class="mt-3 hidden text-sm font-semibold text-fuchsia-300 group-hover:underline sm:block">
                       {m.data.link.label} ↗
                     </span>
                   </span>
@@ -197,28 +173,31 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
               </li>
             ))}
           </ul>
+          <p class="reveal font-display mt-5 max-w-3xl text-lg leading-tight sm:mt-10 sm:text-2xl lg:text-3xl font-extrabold tracking-tight" style={`--i:${more.length + 2}`}>
+            <span aria-hidden="true">🔮 </span>{site.more.outlook}
+          </p>
         </Slide>
       )
     }
 
     <!-- 5. Closing credits, in NobodyWho's brand colours -->
     <Slide id="credits" class="nw-ground font-nw text-nw-ink" blob="bg-nw-glow" label={`${credits.kicker} ${credits.name}`}>
-      <div class="grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-center lg:gap-12">
+      <div class="grid gap-6 sm:gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-center lg:gap-12">
         <div>
           <p class="reveal font-nw-mono text-sm font-medium tracking-[0.2em] text-nw-accent uppercase" style="--i:0">
             {credits.kicker}
           </p>
-          <h2 class="reveal mt-3 text-[clamp(3rem,6.5vw,5.5rem)] leading-[0.9] font-bold tracking-tight" style="--i:1">
+          <h2 class="reveal mt-2 text-[clamp(2.5rem,6.5vw,5.5rem)] sm:mt-3 leading-[0.9] font-bold tracking-tight" style="--i:1">
             {credits.name}
           </h2>
-          <p class="reveal mt-4 text-2xl font-semibold text-nw-accent sm:text-3xl" style="--i:2">{credits.slogan}</p>
-          <p class="reveal mt-5 max-w-xl text-lg leading-relaxed text-nw-ink/75" style="--i:3">{credits.body}</p>
-          <div class="reveal mt-8 flex flex-wrap gap-3" style="--i:4">
+          <p class="reveal mt-3 text-xl font-semibold text-nw-accent sm:mt-4 sm:text-3xl" style="--i:2">{credits.slogan}</p>
+          <p class="reveal mt-3 max-w-xl text-base leading-snug text-nw-ink/75 sm:mt-5 sm:text-lg sm:leading-relaxed" style="--i:3">{credits.body}</p>
+          <div class="reveal mt-5 flex flex-wrap gap-2 sm:mt-8 sm:gap-3" style="--i:4">
             <a
               href={credits.github}
               target="_blank"
               rel="noopener"
-              class="inline-flex items-center gap-2 rounded-full bg-nw-accent px-5 py-3 font-semibold text-nw-deep transition hover:scale-105"
+              class="inline-flex items-center gap-2 rounded-full bg-nw-accent px-4 py-2 text-sm font-semibold sm:px-5 sm:py-3 sm:text-base text-nw-deep transition hover:scale-105"
             >
               <svg viewBox="0 0 16 16" class="size-5" fill="currentColor" aria-hidden="true">
                 <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
@@ -229,7 +208,7 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
               href={credits.website}
               target="_blank"
               rel="noopener"
-              class="inline-flex items-center gap-1.5 rounded-full px-5 py-3 font-semibold ring-1 ring-nw-ink/35 ring-inset transition hover:bg-nw-ink/10"
+              class="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold sm:px-5 sm:py-3 sm:text-base ring-1 ring-nw-ink/35 ring-inset transition hover:bg-nw-ink/10"
             >
               nobodywho.ai
               <svg viewBox="0 0 20 20" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 14.5 14.5 5.5M7 5.5h7.5V13" /></svg>
@@ -244,21 +223,21 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
                 href={p.url}
                 target="_blank"
                 rel="noopener"
-                class="group flex aspect-square h-full flex-col items-center justify-center gap-2 rounded-3xl border border-nw-ink/20 bg-nw-deep/70 p-3 backdrop-blur transition hover:-translate-y-1 hover:border-nw-accent/60 hover:text-nw-accent"
+                class="group flex aspect-square h-full flex-col items-center justify-center gap-1.5 rounded-2xl sm:gap-2 sm:rounded-3xl border border-nw-ink/20 bg-nw-deep/70 p-3 backdrop-blur transition hover:-translate-y-1 hover:border-nw-accent/60 hover:text-nw-accent"
               >
-                <svg viewBox="0 0 24 24" class="size-9 shrink-0 transition group-hover:scale-110 sm:size-11" fill="currentColor" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="size-7 shrink-0 transition group-hover:scale-110 sm:size-11" fill="currentColor" aria-hidden="true">
                   <path d={p.icon} />
                 </svg>
-                <span class="text-center text-xs leading-tight font-semibold sm:text-sm">{p.name}</span>
+                <span class="text-center text-[0.65rem] leading-tight font-semibold sm:text-sm">{p.name}</span>
               </a>
             </li>
           ))}
         </ul>
       </div>
 
-      <div class="reveal mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-nw-ink/30 pt-6" style="--i:6">
-        <p class="text-xl font-semibold">{credits.signoff}</p>
-        <a href="#intro" class="inline-flex items-center gap-2 rounded-full px-5 py-2.5 font-semibold ring-1 ring-nw-ink/35 ring-inset transition hover:bg-nw-ink/10">
+      <div class="reveal mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-nw-ink/30 pt-4 sm:mt-14 sm:gap-4 sm:pt-6" style="--i:6">
+        <p class="text-lg font-semibold sm:text-xl">{credits.signoff}</p>
+        <a href="#intro" class="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ring-1 ring-nw-ink/35 ring-inset transition hover:bg-nw-ink/10 sm:px-5 sm:py-2.5 sm:text-base">
           <svg viewBox="0 0 24 24" class="size-[1.1rem]" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
           Watch again
         </a>
