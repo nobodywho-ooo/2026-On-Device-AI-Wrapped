@@ -9,12 +9,6 @@ export const themes = {
     accent: 'bg-zinc-950 text-lime-300',
     blob: 'bg-emerald-500',
   },
-  pink: {
-    bg: 'bg-pink-400',
-    text: 'text-zinc-950',
-    accent: 'bg-zinc-950 text-pink-300',
-    blob: 'bg-fuchsia-600',
-  },
   violet: {
     bg: 'bg-violet-700',
     text: 'text-white',

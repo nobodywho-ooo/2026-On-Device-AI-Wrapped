@@ -27,12 +27,6 @@ export const sections = [
     theme: 'black',
   },
   {
-    id: 'agents',
-    title: 'Agents at home',
-    subtitle: 'Open agents that remember, plan and act, and can run on a model on your own machine.',
-    theme: 'pink',
-  },
-  {
     id: 'llama-cpp',
     title: 'The engine room',
     subtitle: 'The runtimes under local AI apps grew up: llama.cpp, Google\'s LiteRT-LM and PyTorch\'s ExecuTorch.',

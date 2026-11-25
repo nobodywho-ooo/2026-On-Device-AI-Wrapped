@@ -5,7 +5,7 @@ import { themeNames } from './themes';
 import { sectionIds } from './sections';
 
 /** Brand logos available in `src/components/Logo.astro`. */
-const logo = z.enum(['apple', 'google', 'bonsai', 'gemma', 'liquid', 'qwen', 'hermes', 'pi', 'pytorch']).optional();
+const logo = z.enum(['apple', 'google', 'bonsai', 'gemma', 'liquid', 'qwen', 'pytorch']).optional();
 
 /**
  * Every news item is one Markdown file in `src/content/news/`.
