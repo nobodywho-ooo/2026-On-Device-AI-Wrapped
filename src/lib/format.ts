@@ -13,6 +13,19 @@ export const formatDateRange = (dates: Date[]) => {
   return `${shortMonthFmt.format(sorted[0])} – ${shortMonthFmt.format(sorted.at(-1)!)}`;
 };
 
+/** All dates on a timeline or grouped-timeline slide, or undefined for a single-date slide. */
+export const timelineDates = (data: {
+  timeline?: { date: Date }[];
+  groups?: { items: { date: Date }[] }[];
+}) => data.timeline?.map((e) => e.date) ?? data.groups?.flatMap((g) => g.items.map((i) => i.date));
+
+/** Readable name for a link's site, e.g. "Hugging Face" or "GitHub". */
+export const siteName = (url: string) => {
+  const host = new URL(url).hostname.replace(/^www\./, '');
+  const known: Record<string, string> = { 'huggingface.co': 'Hugging Face', 'github.com': 'GitHub' };
+  return known[host] ?? host;
+};
+
 export const categoryLabels = {
   model: 'New model',
   tooling: 'Tooling',

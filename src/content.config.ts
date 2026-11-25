@@ -29,7 +29,7 @@ const news = defineCollection({
     emoji: z.string(),
     /** Optional brand logo shown instead of the emoji, see `src/components/Logo.astro`. */
     logo,
-    /** The big Wrapped-style number on the slide. Required unless the slide has a `timeline`. */
+    /** The big Wrapped-style number on the slide. Required unless the slide has a `timeline` or `groups`. */
     stat: z
       .object({
         value: z.string(),
@@ -57,6 +57,22 @@ const news = defineCollection({
         }),
       )
       .optional(),
+    /**
+     * Like `timeline`, but each stop on the line is a group of smaller dated items.
+     * Groups alternate above and below the line, so it fits more on one slide.
+     */
+    groups: z
+      .array(
+        z.object({
+          /** Short heading, e.g. "New bindings". */
+          name: z.string(),
+          /** Short labels, each with its own date. */
+          items: z.array(z.object({ label: z.string(), date: z.coerce.date() })).min(1),
+          /** Optional sentence under the items. */
+          detail: z.string().optional(),
+        }),
+      )
+      .optional(),
     /** One or two sentences. */
     summary: z.string(),
     /** Short bullet points (3–4 reads best). */
@@ -65,11 +81,13 @@ const news = defineCollection({
     links: z.array(z.object({ label: z.string(), url: z.string().url() })).default([]),
     /** Show a "Try it on your phone" button that opens the NobodyWho Chat app-store links, see `src/site.config.ts`. */
     tryOnPhone: z.boolean().default(false),
+    /** Set the title in the NobodyWho wordmark style, without the icon. Use with title `nobodywho`. */
+    wordmark: z.boolean().default(false),
     /** Colour palette for the slide, see `src/themes.ts`. */
     theme: z.enum(themeNames),
     /** Set to true to hide an item without deleting the file. */
     draft: z.boolean().default(false),
-  }).refine((d) => d.stat || d.timeline, { message: 'A news item needs a `stat` or a `timeline`.' }),
+  }).refine((d) => d.stat || d.timeline || d.groups, { message: 'A news item needs a `stat`, a `timeline` or `groups`.' }),
 });
 
 /**

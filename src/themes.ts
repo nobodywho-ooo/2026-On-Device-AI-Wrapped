@@ -82,7 +82,24 @@ export const themes = {
     accent: 'bg-zinc-950 text-zinc-200',
     blob: 'bg-zinc-500',
   },
+  // NobodyWho's garnet, cream and amber. Also used on the closing slide.
+  nobodywho: {
+    bg: 'bg-nw-ground',
+    text: 'text-nw-ink',
+    accent: 'bg-nw-accent text-nw-deep',
+    blob: 'bg-nw-glow',
+    /** Timeline cards; other themes use black cards. */
+    card: 'bg-nw-deep text-nw-ink',
+  },
 } as const;
+
+type Theme = (typeof themes)[keyof typeof themes];
+
+/** Classes for timeline cards on a slide in this theme. */
+export const cardClass = (t: Theme) => ('card' in t ? t.card : 'bg-zinc-950 text-white');
+
+/** The NobodyWho wordmark: always lowercase "nobodywho", Inter Tight 600, tracked -0.035em. */
+export const wordmarkClass = 'font-nw font-semibold tracking-[-0.035em]';
 
 export type ThemeName = keyof typeof themes;
 export const themeNames = Object.keys(themes) as [ThemeName, ...ThemeName[]];

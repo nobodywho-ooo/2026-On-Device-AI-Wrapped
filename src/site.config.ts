@@ -31,7 +31,8 @@ export const site = {
   /** Closing slide. */
   credits: {
     kicker: 'Brought to you by',
-    name: 'NobodyWho',
+    /** Shown as the wordmark, which is always lowercase. */
+    name: 'nobodywho',
     slogan: 'On-device AI for any device.',
     body: 'NobodyWho is an open-source inference engine that runs LLMs locally and efficiently on phones, laptops, headsets & smartwatches. Powered by the wonderful llama.cpp, totally free to use, even in commercial projects.',
     /** Platform logos on the closing slide; each opens its docs. Icon paths from Simple Icons (24×24). */

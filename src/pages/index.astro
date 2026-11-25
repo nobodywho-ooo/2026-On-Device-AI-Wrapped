@@ -9,15 +9,25 @@ import SectionSlide from '../components/SectionSlide.astro';
 import TryOnPhone from '../components/TryOnPhone.astro';
 import { site } from '../site.config';
 import { sections } from '../sections';
+import { wordmarkClass } from '../themes';
 import { formatDate } from '../lib/format';
 
 const allNews = (await getCollection('news', ({ data }) => !data.draft)).sort(
   (a, b) => a.data.date.getTime() - b.data.date.getTime(),
 );
 
+// A chapter's explicit `order` first, then anything it doesn't list (still by date, as the sort is stable).
+const byChapterOrder = (order: readonly string[]) => (a: { id: string }, b: { id: string }) => {
+  const rank = (id: string) => (order.includes(id) ? order.indexOf(id) : order.length);
+  return rank(a.id) - rank(b.id);
+};
+
 // Group the news into chapters (in the order of src/sections.ts), dropping empty ones.
 const chapters = sections
-  .map((section) => ({ section, items: allNews.filter((n) => n.data.section === section.id) }))
+  .map((section) => {
+    const items = allNews.filter((n) => n.data.section === section.id);
+    return { section, items: 'order' in section ? [...items].sort(byChapterOrder(section.order)) : items };
+  })
   .filter((c) => c.items.length > 0);
 // News in the order it is shown, so slide numbers follow the page.
 const news = chapters.flatMap((c) => c.items);
@@ -129,7 +139,7 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
         <>
           <SectionSlide section={section} number={c + 1} items={items} />
           {!('single' in section) && items.map((item) =>
-            item.data.timeline ? (
+            item.data.timeline || item.data.groups ? (
               <TimelineSlide item={item} index={news.indexOf(item)} total={news.length} />
             ) : (
               <NewsSlide item={item} index={news.indexOf(item)} total={news.length} />
@@ -187,7 +197,7 @@ const marquee = news.map((n) => `${n.data.emoji} ${n.data.title}`).join('  ·  '
           <p class="reveal font-nw-mono text-sm font-medium tracking-[0.2em] text-nw-accent uppercase" style="--i:0">
             {credits.kicker}
           </p>
-          <h2 class="reveal mt-2 text-[clamp(2.5rem,6.5vw,5.5rem)] sm:mt-3 leading-[0.9] font-bold tracking-tight" style="--i:1">
+          <h2 class:list={['reveal mt-2 text-[clamp(2.5rem,6.5vw,5.5rem)] sm:mt-3 leading-[0.9]', wordmarkClass]} style="--i:1">
             {credits.name}
           </h2>
           <p class="reveal mt-3 text-xl font-semibold text-nw-accent sm:mt-4 sm:text-3xl" style="--i:2">{credits.slogan}</p>

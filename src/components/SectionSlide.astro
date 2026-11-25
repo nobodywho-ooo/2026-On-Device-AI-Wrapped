@@ -2,8 +2,8 @@
 import type { CollectionEntry } from 'astro:content';
 import Slide from './Slide.astro';
 import ItemIcon from './ItemIcon.astro';
-import { themes } from '../themes';
-import { formatDate, formatDateRange, statFontSize } from '../lib/format';
+import { themes, wordmarkClass } from '../themes';
+import { formatDate, formatDateRange, statFontSize, timelineDates } from '../lib/format';
 import type { sections } from '../sections';
 
 /**
@@ -132,9 +132,9 @@ const single = 'single' in section && section.single;
                   emojiClass="text-3xl leading-none"
                 />
                 <span class="min-w-0">
-                  <span class="block text-lg leading-tight font-bold group-hover:underline">{item.data.title}</span>
+                  <span class:list={['block text-lg leading-tight group-hover:underline', item.data.wordmark ? wordmarkClass : 'font-bold']}>{item.data.title}</span>
                   <span class="block text-sm opacity-75">
-                    {item.data.timeline ? formatDateRange(item.data.timeline.map((e) => e.date)) : formatDate(item.data.date)} ·{' '}
+                    {timelineDates(item.data) ? formatDateRange(timelineDates(item.data)!) : formatDate(item.data.date)} ·{' '}
                     {item.data.org}
                   </span>
                 </span>
